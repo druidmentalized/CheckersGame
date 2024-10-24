@@ -1,49 +1,71 @@
 package Main;
 
-//COLOR FOR DARK SQUARES: rgba(180,163,137,255)
-
-//COLOR FOR LIGHT SQUARES: rgba(255,252,249,255)
-
 import javax.swing.*;
 import java.awt.*;
 
-public class GameBoard extends JLayeredPane{
+public class GameBoard extends JPanel{
 
     //SINGLETON
     private static GameBoard instance;
 
-    //MAP LAYERS
-    private final JPanel tilesLayer = new JPanel();
-    private final JPanel piecesLayer = new JPanel();
-    private final JPanel popupLayer = new JPanel();
-
     //MAP VARIABLES
+    Graphics2D g2d;
+    private final int tileSize = 96; //in pixels
+    private final int boardSize = 8; //in squares
+    private final int boardPixelSize = tileSize * boardSize;
 
     private GameBoard() {
-        this.setLayout(null);
-
-        //setting tiles layer
-        tilesLayer.setLayout(new GridBagLayout());
-        tilesLayer.setOpaque(false);
-        setTiles();
-
-        //setting pieces layer
-        piecesLayer.setLayout(null);
-        piecesLayer.setOpaque(false);
-
-        //setting popup layer
-        popupLayer.setLayout(null);
-        popupLayer.setOpaque(false);
-
-        this.add(tilesLayer, Integer.valueOf(1));
-        this.add(tilesLayer, Integer.valueOf(2));
-        this.add(tilesLayer, Integer.valueOf(3));
+        this.setPreferredSize(new Dimension(boardPixelSize, boardPixelSize));
+        repaint();
     }
 
-    private void setTiles() {
-
+    public void paintComponent(Graphics g) {
+        g2d = (Graphics2D) g;
+        setTiles(g2d);
+        setChips(g2d);
     }
 
+    private void setTiles(Graphics2D g2d) {
+        //filling the map with tiles
+        for (int row = 0; row < boardSize; row++) {
+            for (int column = 0; column < boardSize; column++) {
+
+                //adding tiles to map
+                if ((row % 2 == 0 && column % 2 == 0) || (row % 2 == 1 && column % 2 == 1)) {
+                    g2d.setColor(new Color(255,252,249));
+                    g2d.fillRect(column * tileSize, row * tileSize, tileSize, tileSize);
+                }
+                else {
+                    g2d.setColor(new Color(180,163,137));
+                    g2d.fillRect(column * tileSize, row * tileSize, tileSize, tileSize);
+                }
+            }
+        }
+    }
+
+
+    //TODO:get rid of this method when using JNI
+    private void setChips(Graphics2D g2d) {
+        for (int row = 0; row < boardSize; row++) {
+            for (int column = 0; column < boardSize; column++) {
+                if ((row % 2 == 0 && column % 2 == 1) || (row % 2 == 1 && column % 2 == 0)) {
+                    if (row < 3) {
+                        drawChip(g2d, column * tileSize, row * tileSize, false);
+                    }
+                    else if (row > 4) {
+                        drawChip(g2d, column * tileSize, row * tileSize, true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void drawChip(Graphics2D g2d, int x, int y, boolean isWhite) {
+        g2d.setColor(isWhite ? Color.WHITE : Color.BLACK);
+        g2d.fillOval(x + 7, y + 7, tileSize - 14, tileSize - 14);
+    }
+
+    //GETTERS & SETTERS
     public static GameBoard getInstance() {
         if (instance == null) {
             instance = new GameBoard();

@@ -1,7 +1,9 @@
 package Main;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class Main {
 
@@ -12,10 +14,19 @@ public class Main {
 
     private static void createWindow() {
         window = new JFrame("CheckersGame");
+        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setResizable(false);
-        window.getContentPane().setLayout(new CardLayout());
 
-        //TODO: add different cards for menu and actual playable zone
+        //setting icon;
+        try {
+            window.setIconImage(ImageIO.read(Main.class.getResource("/checkers_icon.png")));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        //adding game board to the frame
+        window.add(GameBoard.getInstance());
 
         window.pack();
         window.setLocationRelativeTo(null);
