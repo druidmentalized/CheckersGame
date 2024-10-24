@@ -2,6 +2,8 @@ package Main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class GameBoard extends JPanel{
 
@@ -16,13 +18,23 @@ public class GameBoard extends JPanel{
 
     private GameBoard() {
         this.setPreferredSize(new Dimension(boardPixelSize, boardPixelSize));
+
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int column = e.getX() / tileSize;
+                int row = e.getY() / tileSize;
+
+                handleClick(row, column);
+            }
+        });
+
         repaint();
     }
 
     public void paintComponent(Graphics g) {
         g2d = (Graphics2D) g;
         setTiles(g2d);
-        setChips(g2d);
     }
 
     private void setTiles(Graphics2D g2d) {
@@ -43,27 +55,14 @@ public class GameBoard extends JPanel{
         }
     }
 
-
-    //TODO:get rid of this method when using JNI
-    private void setChips(Graphics2D g2d) {
-        for (int row = 0; row < boardSize; row++) {
-            for (int column = 0; column < boardSize; column++) {
-                if ((row % 2 == 0 && column % 2 == 1) || (row % 2 == 1 && column % 2 == 0)) {
-                    if (row < 3) {
-                        drawChip(g2d, column * tileSize, row * tileSize, false);
-                    }
-                    else if (row > 4) {
-                        drawChip(g2d, column * tileSize, row * tileSize, true);
-                    }
-                }
-            }
-        }
-    }
-
     private void drawChip(Graphics2D g2d, int x, int y, boolean isWhite) {
         g2d.setColor(isWhite ? Color.WHITE : Color.BLACK);
         g2d.fillOval(x + 7, y + 7, tileSize - 14, tileSize - 14);
     }
+
+    //NATIVE METHODS
+    private native void setChips();
+    private native void handleClick(int row, int column);
 
     //GETTERS & SETTERS
     public static GameBoard getInstance() {

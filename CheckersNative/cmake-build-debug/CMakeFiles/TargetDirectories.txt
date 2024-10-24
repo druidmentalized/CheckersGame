@@ -1,0 +1,3 @@
+C:/IDEAProjects/CheckersGame/CheckersNative/cmake-build-debug/CMakeFiles/CheckersNative.dir
+C:/IDEAProjects/CheckersGame/CheckersNative/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/IDEAProjects/CheckersGame/CheckersNative/cmake-build-debug/CMakeFiles/rebuild_cache.dir
