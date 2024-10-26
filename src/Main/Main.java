@@ -32,14 +32,4 @@ public class Main {
         window.setLocationRelativeTo(null);
         window.setVisible(true);
     }
-
-
-    private static void changeWindow(String changedPanel) {
-        CardLayout cardLayout = (CardLayout) window.getContentPane().getLayout();
-        cardLayout.show(window.getContentPane(), changedPanel);
-
-        window.revalidate();
-        window.repaint();
-        window.pack();
-    }
 }

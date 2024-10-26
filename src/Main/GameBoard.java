@@ -16,6 +16,12 @@ public class GameBoard extends JPanel{
     private final int boardSize = 8; //in squares
     private final int boardPixelSize = tileSize * boardSize;
 
+    static {
+        System.load("C:\\Windows\\System32\\LicenseManager.dll");
+        System.loadLibrary("libCheckersNative");
+        //System.load("C:\\IDEAProjects\\CheckersGame\\CheckersNative\\cmake-build-debug\\libCheckersNative.dll");
+    }
+
     private GameBoard() {
         this.setPreferredSize(new Dimension(boardPixelSize, boardPixelSize));
 
@@ -54,7 +60,6 @@ public class GameBoard extends JPanel{
 
                 int currentTileInformation = getTileInformation(row, column);
                 int chipType = currentTileInformation % 10;
-
                 currentTileInformation /= 10;
 
                 //drawing selected tile(if exists)
