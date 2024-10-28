@@ -1,25 +1,18 @@
 #ifndef CHECKERSNATIVE_CHIP_H
 #define CHECKERSNATIVE_CHIP_H
 
-enum Color {
-    WHITE,
-    BLACK
-};
-
 class Chip {
 
 private:
-    Color color;
+    bool White;
     bool King;
-    bool Chosen;
 
 public:
-    Chip(Color color, bool King);
+    Chip(bool White, bool King);
 
-    Color getColor() const;
+    bool isWhite() const;
 
     bool isKing() const;
-    bool isChosen() const;
 };
 
 
