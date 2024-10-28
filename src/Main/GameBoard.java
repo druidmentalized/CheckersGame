@@ -17,9 +17,7 @@ public class GameBoard extends JPanel{
     private final int boardPixelSize = tileSize * boardSize;
 
     static {
-        System.load("C:\\Windows\\System32\\LicenseManager.dll");
         System.loadLibrary("libCheckersNative");
-        //System.load("C:\\IDEAProjects\\CheckersGame\\CheckersNative\\cmake-build-debug\\libCheckersNative.dll");
     }
 
     private GameBoard() {
@@ -61,11 +59,19 @@ public class GameBoard extends JPanel{
                 int currentTileInformation = getTileInformation(row, column);
                 int chipType = currentTileInformation % 10;
                 currentTileInformation /= 10;
+                int canChipTurn = currentTileInformation % 10;
+                currentTileInformation /= 10;
 
                 //drawing selected tile(if exists)
                 if (currentTileInformation == 2) { //selected tile
                     g2d.setColor(new Color(113, 102, 86));
                     g2d.fillRect(column * tileSize, row * tileSize, tileSize, tileSize);
+                }
+
+                if (canChipTurn == 2) {
+                    g2d.setColor(Color.RED);
+                    g2d.setStroke(new BasicStroke(5f));
+                    g2d.drawRect(column * tileSize, row * tileSize, tileSize, tileSize);
                 }
 
                 //drawing figure(if exists)
@@ -83,7 +89,8 @@ public class GameBoard extends JPanel{
         g2d.setColor(isWhite ? Color.WHITE : Color.BLACK);
         g2d.fillOval(x + 7, y + 7, tileSize - 14, tileSize - 14);
         if (isKing) {
-            //TODO: make drawing of a king chip
+            g2d.setColor(Color.YELLOW);
+            g2d.fillOval(x + 33, y + 33, tileSize - 66, tileSize - 66);
         }
     }
 
