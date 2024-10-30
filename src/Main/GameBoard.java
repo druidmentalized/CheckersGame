@@ -15,7 +15,6 @@ public class GameBoard extends JPanel{
     private final int tileSize = 96; //in pixels
     private final int boardSize = 8; //in squares
     private final int boardPixelSize = tileSize * boardSize;
-    private final KeyHandler keyHandler = new KeyHandler();
 
     static {
         System.loadLibrary("libCheckersNative");
@@ -108,7 +107,6 @@ public class GameBoard extends JPanel{
         }
     }
 
-    //todo: make winner drawing
     private void drawWinnerWindow(Graphics2D g2d, int winnerId) {
         //drawing background
         g2d.setColor(new Color(0, 0, 0, 160));
