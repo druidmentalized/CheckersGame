@@ -7,13 +7,16 @@ private:
     bool White;
     bool King;
     bool Turn;
+    bool Winner;
 
 public:
     Chip(bool White, bool King);
+    Chip(bool White, bool King, bool Winner);
 
     bool isWhite() const;
     bool isKing() const;
     bool canTurn() const;
+    bool isWinner() const;
 
     void setKing(bool king);
     void setTurn(bool turn);

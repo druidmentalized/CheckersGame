@@ -13,9 +13,10 @@ int chosenColumn = -1;
 bool whiteTurn = true;
 std::vector<std::vector<int>> deletedChips; //coordinates of chips that will be deleted during execution of the "makeMove" method
 bool captureAvailable = false;
+bool sideCanTurn = true;
 
 bool canMakeMove (int, int, int, int);
-bool isMovingInCorrectDirection(int, int, int, int);
+bool isMovingInCorrectDirection(int, int, int, int, const Chip&);
 void makeMove (int, int, int, int);
 bool isCaptureMove(int, int, int, int, const Chip&);
 bool isMoveInBounds(int, int);
@@ -23,6 +24,10 @@ void determineWhoCanTurn();
 
 JNIEXPORT void JNICALL Java_Main_GameBoard_setupGame
         (JNIEnv *, jobject){
+    //setting all game variables to a start state
+    chosenRow = -1;
+    chosenColumn = -1;
+    whiteTurn = true;
 
     //initializing game board
     gameBoard.resize(8);
@@ -43,9 +48,22 @@ JNIEXPORT void JNICALL Java_Main_GameBoard_setupGame
         }
     }
 
-    //todo: get rid of it after testing king chip
     gameBoard[5][0] = std::make_unique<Chip>(true, true);
     gameBoard[2][7] = std::make_unique<Chip>(false, true);
+
+/*    gameBoard.resize(8);
+    for (int row = 0; row < 8; row ++) {
+        gameBoard[row].resize(8);
+        for (int column = 0; column < 8; column++) {
+            gameBoard[row][column] = nullptr;
+        }
+    }
+
+    gameBoard[1][2] = std::make_unique<Chip>(false, false);
+    gameBoard[3][4] = std::make_unique<Chip>(false, false);
+    gameBoard[5][6] = std::make_unique<Chip>(false, false);
+    gameBoard[6][7] = std::make_unique<Chip>(true, false);
+    gameBoard[1][6] = std::make_unique<Chip>(true, false);*/
 
     determineWhoCanTurn();
 }
@@ -73,6 +91,12 @@ JNIEXPORT jint JNICALL Java_Main_GameBoard_getTileInformation
     auto returnInt = int(100);
 
     if (gameBoard[row][column]) {
+
+        //win condition satisfied
+        if (gameBoard[row][column] -> isWinner()) {
+            return (gameBoard[row][column] -> isWhite() ? -1 : -2);
+        }
+
         //determining whether chosen
         returnInt = ((chosenRow == row && chosenColumn == column) ? 2 : 1) * 10;
 
@@ -89,9 +113,11 @@ JNIEXPORT jint JNICALL Java_Main_GameBoard_getTileInformation
 }
 
 bool canMakeMove(int startRow, int startColumn, int desiredRow, int desiredColumn) {
-    if (isMovingInCorrectDirection(startRow, startColumn, desiredRow, desiredColumn)
+    if (gameBoard[startRow][startColumn] -> canTurn()
+        && isMovingInCorrectDirection(startRow, startColumn, desiredRow, desiredColumn, *gameBoard[startRow][startColumn])
         && !gameBoard[desiredRow][desiredColumn]) {
-        if (std::abs(desiredRow - startRow) == 1
+        if (!captureAvailable
+            && std::abs(desiredRow - startRow) == 1
             && std::abs(desiredColumn - startColumn) == 1) { //for casual movement
             return true;
         }
@@ -108,12 +134,12 @@ bool canMakeMove(int startRow, int startColumn, int desiredRow, int desiredColum
     return false;
 }
 
-bool isMovingInCorrectDirection(int startRow, int startColumn, int desiredRow, int desiredColumn) {
-    if (gameBoard[startRow][startColumn] -> isKing()) { return true; } //king chip can move in any direction
+bool isMovingInCorrectDirection(int startRow, int startColumn, int desiredRow, int desiredColumn, const Chip& checkedChip) {;
+    if (checkedChip.isKing()) { return true; } //king chip can move in any direction
     else if (std::abs(desiredRow - startRow) >= std::abs(desiredColumn - startColumn)) { //for captures
-        if ((gameBoard[startRow][startColumn] -> isWhite()) && (desiredRow - startRow < 0) //for white chip
+        if ((checkedChip.isWhite()) && (desiredRow - startRow < 0) //for white chip
             ||
-            (!gameBoard[startRow][startColumn] -> isWhite()) && (desiredRow - startRow > 0)) //for black chip
+            (!checkedChip.isWhite()) && (desiredRow - startRow > 0)) //for black chip
             return true;
     }
     return false;
@@ -150,7 +176,7 @@ bool isCaptureMove(int startRow, int startColumn, int desiredRow, int desiredCol
             tempRow = startRow + direction[0];
             tempColumn = startColumn + direction[1];
             if (isMoveInBounds(tempRow, tempColumn) //next step must be in bounds
-                && isMovingInCorrectDirection(startRow, startColumn, tempRow, tempColumn) //next step must be in correct direction
+                && isMovingInCorrectDirection(startRow, startColumn, tempRow, tempColumn, checkedChip) //next step must be in correct direction
                 && isCaptureMove(startRow, startColumn, tempRow, tempColumn, checkedChip)) { // whether we can capture in this direction
                 if ((tempRow == desiredRow) && (tempColumn == desiredColumn)) { //chip would move to the destination after this capture
                     return true;
@@ -179,10 +205,11 @@ bool isCaptureMove(int startRow, int startColumn, int desiredRow, int desiredCol
 }
 
 bool isMoveInBounds(int row, int column) {
-    return(((0 < row) && (row < 8)) && ((0 < column) && (column < 8)));
+    return(((0 <= row) && (row < 8)) && ((0 <= column) && (column < 8)));
 }
 
 void determineWhoCanTurn() {
+    sideCanTurn = false;
     captureAvailable = false;
     int tempRow;
     int tempColumn;
@@ -199,9 +226,11 @@ void determineWhoCanTurn() {
                         tempRow = row + direction[0];
                         tempColumn = column + direction[1];
                         if (isMoveInBounds(tempRow, tempColumn) //next step must be in bounds
-                            && isMovingInCorrectDirection(row, column, tempRow, tempColumn) //next step must be in correct direction
+                            && isMovingInCorrectDirection(row, column, tempRow, tempColumn, *gameBoard[row][column]) //next step must be in correct direction
+                            && !gameBoard[tempRow][tempColumn]
                             && isCaptureMove(row, column, tempRow, tempColumn, *gameBoard[row][column])) {
                             captureAvailable = true;
+                            sideCanTurn = true;
                             gameBoard[row][column] -> setTurn(true);
                             break;
                         }
@@ -216,16 +245,15 @@ void determineWhoCanTurn() {
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 8; column++) {
                 if (gameBoard[row][column] && gameBoard[row][column] -> isWhite() == whiteTurn) {
-                    std::cout << "Chip on " << row << " " << column << " has color " << (gameBoard[row][column] -> isWhite() == whiteTurn ? "white" : "black") << std::endl;
-                    std::cout << "Color of chip same as turn color? " << (gameBoard[row][column] -> isWhite() == whiteTurn ? "true" : "false") << std::endl;
                     for (auto &direction : movingDirection) {
                         tempRow = row + direction[0];
                         tempColumn = column + direction[1];
 
                         if (isMoveInBounds(tempRow, tempColumn)
-                            && isMovingInCorrectDirection(row, column, tempRow, tempColumn)
+                            && isMovingInCorrectDirection(row, column, tempRow, tempColumn, *gameBoard[row][column])
                             && !gameBoard[tempRow][tempColumn]) {
                             gameBoard[row][column] -> setTurn(true);
+                            sideCanTurn = true;
                             break;
                         }
                     }
@@ -234,4 +262,9 @@ void determineWhoCanTurn() {
         }
     }
     deletedChips.clear();
+
+    //if no turns available, setting the first tile as a special chip to indicate win when Java side will gather information
+    if (!sideCanTurn) {
+        gameBoard[0][0] = std::make_unique<Chip>(!whiteTurn, true, true);
+    }
 }
