@@ -47,24 +47,6 @@ JNIEXPORT void JNICALL Java_Main_GameBoard_setupGame
             }
         }
     }
-
-    gameBoard[5][0] = std::make_unique<Chip>(true, true);
-    gameBoard[2][7] = std::make_unique<Chip>(false, true);
-
-/*    gameBoard.resize(8);
-    for (int row = 0; row < 8; row ++) {
-        gameBoard[row].resize(8);
-        for (int column = 0; column < 8; column++) {
-            gameBoard[row][column] = nullptr;
-        }
-    }
-
-    gameBoard[1][2] = std::make_unique<Chip>(false, false);
-    gameBoard[3][4] = std::make_unique<Chip>(false, false);
-    gameBoard[5][6] = std::make_unique<Chip>(false, false);
-    gameBoard[6][7] = std::make_unique<Chip>(true, false);
-    gameBoard[1][6] = std::make_unique<Chip>(true, false);*/
-
     determineWhoCanTurn();
 }
 

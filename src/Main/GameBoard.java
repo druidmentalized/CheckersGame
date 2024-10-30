@@ -2,8 +2,7 @@ package Main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class GameBoard extends JPanel{
 
@@ -15,6 +14,9 @@ public class GameBoard extends JPanel{
     private final int tileSize = 96; //in pixels
     private final int boardSize = 8; //in squares
     private final int boardPixelSize = tileSize * boardSize;
+    private int keyboardModeFocusedRow = 0;
+    private int keyboardModeFocusedColumn = 0;
+    private boolean keyboardMode = false;
 
     static {
         System.loadLibrary("libCheckersNative");
@@ -24,21 +26,58 @@ public class GameBoard extends JPanel{
         this.setPreferredSize(new Dimension(boardPixelSize, boardPixelSize));
         this.setLayout(null);
 
-        //defining keyboard input
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("UP"), "moveUp");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("W"), "moveUp");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DOWN"), "moveDown");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("S"), "moveDown");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("A"), "moveLeft");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "moveRight");
+        this.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
 
-        //making actions in response to the input
-/*        getActionMap().put("moveUp", new AbstractAction() {
+            }
 
-        })*/
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (!keyboardMode) {
+                    keyboardMode = true;
+                    keyboardModeFocusedRow = 0;
+                    keyboardModeFocusedColumn = 0;
+                }
 
+                int keyCode = e.getKeyCode();
+                switch (keyCode) {
+                    case KeyEvent.VK_UP, KeyEvent.VK_W -> {
+                        keyboardModeFocusedRow -= 1;
+                        if (keyboardModeFocusedRow < 0 ) keyboardModeFocusedRow = 0;
+                    }
+                    case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
+                        keyboardModeFocusedRow += 1;
+                        if (keyboardModeFocusedRow > 7 ) keyboardModeFocusedRow = 7;
+                    }
+                    case KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
+                        keyboardModeFocusedColumn -= 1;
+                        if (keyboardModeFocusedColumn < 0 ) keyboardModeFocusedColumn = 0;
+                    }
+                    case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
+                        keyboardModeFocusedColumn += 1;
+                        if (keyboardModeFocusedColumn > 7 ) keyboardModeFocusedColumn = 7;
+                    }
+                    case KeyEvent.VK_SPACE, KeyEvent.VK_ENTER -> handleClick(keyboardModeFocusedRow, keyboardModeFocusedColumn);
+                    case KeyEvent.VK_F1 -> System.exit(0);
+                }
+                repaint();
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
+        this.setFocusable(true);
+
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (keyboardMode) keyboardMode = false;
+                repaint();
+            }
+        });
 
         this.addMouseListener(new MouseAdapter() {
             @Override
@@ -102,6 +141,13 @@ public class GameBoard extends JPanel{
                     case 2 -> drawChip(g2d, column * tileSize, row * tileSize, true, true);
                     case 3 -> drawChip(g2d, column * tileSize, row * tileSize, false, false);
                     case 4 -> drawChip(g2d, column * tileSize, row * tileSize, false, true);
+                }
+
+                //drawing focused tile for keyboard mode
+                if (keyboardMode) {
+                    g2d.setColor(new Color(130, 90, 20));
+                    g2d.setStroke(new BasicStroke(3f));
+                    g2d.drawRect(keyboardModeFocusedColumn * tileSize, keyboardModeFocusedRow * tileSize, tileSize, tileSize);
                 }
             }
         }
