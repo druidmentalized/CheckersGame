@@ -109,6 +109,22 @@ JNIEXPORT void JNICALL Java_Main_GameBoard_setupGame
 
 /*
  * Class:     Main_GameBoard
+ * Method:    setupEmptyGame
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_Main_GameBoard_setupEmptyGame
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Main_GameBoard
+ * Method:    insertChip
+ * Signature: (IIZZ)V
+ */
+JNIEXPORT void JNICALL Java_Main_GameBoard_insertChip
+  (JNIEnv *, jobject, jint, jint, jboolean, jboolean);
+
+/*
+ * Class:     Main_GameBoard
  * Method:    handleClick
  * Signature: (II)V
  */

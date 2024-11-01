@@ -2,7 +2,7 @@
 
 
 Chip::Chip(bool White, bool King) : White(White), King(King), Turn(false), Winner(false) {}
-Chip::Chip(bool White, bool King, bool Winner) : White(White), King(King), Turn(false), Winner(Winner) {};
+Chip::Chip(bool White, bool King, bool Winner) : White(White), King(King), Turn(false), Winner(Winner) {}
 
 bool Chip::isKing() const { return King; }
 bool Chip::isWhite() const { return White; }

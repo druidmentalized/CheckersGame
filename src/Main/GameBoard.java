@@ -7,7 +7,7 @@ import java.awt.event.*;
 public class GameBoard extends JPanel{
 
     //SINGLETON
-    private static GameBoard instance;
+    private volatile static GameBoard instance;
 
     //MAP VARIABLES
     Graphics2D g2d;
@@ -29,7 +29,7 @@ public class GameBoard extends JPanel{
         this.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
-
+                //empty
             }
 
             @Override
@@ -66,7 +66,7 @@ public class GameBoard extends JPanel{
 
             @Override
             public void keyReleased(KeyEvent e) {
-
+                //empty
             }
         });
         this.setFocusable(true);
@@ -74,8 +74,10 @@ public class GameBoard extends JPanel{
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                if (keyboardMode) keyboardMode = false;
-                repaint();
+                if (keyboardMode) {
+                    keyboardMode = false;
+                    repaint();
+                }
             }
         });
 
@@ -106,10 +108,21 @@ public class GameBoard extends JPanel{
                 if ((row % 2 == 0 && column % 2 == 0) || (row % 2 == 1 && column % 2 == 1)) {
                     g2d.setColor(new Color(60,60,60));
                     g2d.fillRect(column * tileSize, row * tileSize, tileSize, tileSize);
+                    g2d.setColor(new Color(30,30,30)); //for drawing letters
                 }
                 else {
                     g2d.setColor(new Color(30,30,30));
                     g2d.fillRect(column * tileSize, row * tileSize, tileSize, tileSize);
+                    g2d.setColor(new Color(60,60,60)); //for drawing letters
+                }
+
+                //drawing letter or number if needed
+                g2d.setFont(new Font("Times New Roman", Font.BOLD, 20));
+                if (column == 0) {
+                    g2d.drawString(String.valueOf(8 - row), 5, row * tileSize + 20);
+                }
+                if (row == 7) {
+                    g2d.drawString(String.valueOf((char)('a' + column)), (column + 1) * tileSize - 15, 8 * tileSize - 5);
                 }
 
                 int currentTileInformation = getTileInformation(row, column);
@@ -121,16 +134,14 @@ public class GameBoard extends JPanel{
 
                 int chipType = currentTileInformation % 10;
                 currentTileInformation /= 10;
-                int canChipTurn = currentTileInformation % 10;
-                currentTileInformation /= 10;
 
-                if (canChipTurn == 2) {
+                if (currentTileInformation == 2) {
                     g2d.setColor(new Color(200, 255, 200));
                     g2d.fillRect(column * tileSize, row * tileSize, tileSize, tileSize);
                 }
 
                 //drawing selected tile(if exists)
-                if (currentTileInformation == 2) { //selected tile
+                if (currentTileInformation == 3) { //selected tile
                     g2d.setColor(new Color(160, 120, 40));
                     g2d.fillRect(column * tileSize, row * tileSize, tileSize, tileSize);
                 }
@@ -197,15 +208,15 @@ public class GameBoard extends JPanel{
     }
 
     private void drawChip(Graphics2D g2d, int x, int y, boolean isWhite, boolean isKing) {
-        //Drawing shadow
-        g2d.setColor(new Color(0, 0, 0, 80)); // Semi-transparent black for shadow
+        //drawing shadow
+        g2d.setColor(new Color(0, 0, 0, 80)); //semi-transparent black for shadow
         g2d.fillOval(x + 10, y + 10, tileSize - 14, tileSize - 14);
 
-        //Drawing outer outline
+        //drawing outer outline
         g2d.setColor(isWhite ? new Color(180, 150, 110) : new Color(15, 15, 15));
         g2d.fillOval(x + 5, y + 5, tileSize - 10, tileSize - 10);
 
-        //Drawing inner gradient for 3D effect
+        //drawing inner gradient for 3D effect
         Color baseColor = isWhite ? new Color(210, 180, 140) : new Color(20, 20, 20);
         Color highlightColor = isWhite ? new Color(240, 220, 190) : new Color(50, 50, 50);
 
@@ -218,37 +229,36 @@ public class GameBoard extends JPanel{
         g2d.setPaint(gradient);
         g2d.fillOval(x + 7, y + 7, tileSize - 14, tileSize - 14);
 
-        //Drawing inner shadow for added depth
+        //drawing inner shadow for added depth
         g2d.setColor(isWhite ? new Color(190, 160, 120) : new Color(10, 10, 10));
         g2d.fillOval(x + 10, y + 10, tileSize - 20, tileSize - 20);
 
-        //Drawing king marker if necessary
+        //drawing king marker if necessary
         if (isKing) {
             g2d.setColor(isWhite ? new Color(120, 80, 40) : new Color(200, 160, 0)); // Darker golden color for king indicator
-            drawCrown(g2d, x + tileSize / 2, y + tileSize / 2, tileSize / 4);
+            drawCrown(g2d, x + tileSize / 2, y + tileSize / 2);
         }
     }
 
-    private void drawCrown(Graphics2D g2d, int centerX, int centerY, int size) {
-        int crownWidth = size;
-        int crownHeight = size / 2;
+    private void drawCrown(Graphics2D g2d, int centerX, int centerY) {
+        int crownHeight = 24 / 2;
 
-        //Drawing three triangles for the crown peaks
-        int[] xPoints1 = {centerX - crownWidth / 2, centerX - crownWidth / 4, centerX};
+        //drawing three triangles for the crown peaks
+        int[] xPoints1 = {centerX - 24 / 2, centerX - 24 / 4, centerX};
         int[] yPoints1 = {centerY, centerY - crownHeight, centerY};
         g2d.fillPolygon(xPoints1, yPoints1, 3);
 
-        int[] xPoints2 = {centerX, centerX + crownWidth / 4, centerX + crownWidth / 2};
+        int[] xPoints2 = {centerX, centerX + 24 / 4, centerX + 24 / 2};
         int[] yPoints2 = {centerY, centerY - crownHeight, centerY};
         g2d.fillPolygon(xPoints2, yPoints2, 3);
 
-        //Drawing the base of the crown as a rectangle
-        g2d.fillRect(centerX - crownWidth / 2, centerY, crownWidth, crownHeight / 3);
+        //drawing the base of the crown as a rectangle
+        g2d.fillRect(centerX - 24 / 2, centerY, 24, crownHeight / 3);
 
-        //Drawing small circles at the top of each peak to represent jewels
-        g2d.fillOval(centerX - crownWidth / 2 - 2, centerY - crownHeight - 2, 4, 4);
+        //drawing small circles at the top of each peak to represent jewels
+        g2d.fillOval(centerX - 24 / 2 - 2, centerY - crownHeight - 2, 4, 4);
         g2d.fillOval(centerX - 2, centerY - crownHeight - 2, 4, 4);
-        g2d.fillOval(centerX + crownWidth / 2 - 2, centerY - crownHeight - 2, 4, 4);
+        g2d.fillOval(centerX + 24 / 2 - 2, centerY - crownHeight - 2, 4, 4);
     }
 
     private JButton makeButton(String buttonName) {
@@ -272,9 +282,11 @@ public class GameBoard extends JPanel{
     }
 
     //NATIVE METHODS
-    private native void setupGame();
-    private native void handleClick(int row, int column);
-    private native int getTileInformation(int row, int column);
+    public native void setupGame();
+    public native void setupEmptyGame();
+    public native void insertChip(int row, int column, boolean isWhite, boolean isKing);
+    public native void handleClick(int row, int column);
+    public native int getTileInformation(int row, int column);
 
     //GETTERS & SETTERS
     public static GameBoard getInstance() {
