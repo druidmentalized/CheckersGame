@@ -2,18 +2,16 @@ package Main;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 
 public class Main {
 
-    private static JFrame window;
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::createWindow);
     }
 
     private static void createWindow() {
-        window = new JFrame("CheckersGame");
+        JFrame window = new JFrame("CheckersGame");
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setResizable(false);
 

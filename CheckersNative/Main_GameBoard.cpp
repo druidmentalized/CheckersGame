@@ -2,7 +2,6 @@
 #include <vector>
 #include <memory>
 #include <cmath>
-#include <iostream>
 #include <algorithm>
 
 #include "Main_GameBoard.h"
@@ -17,7 +16,7 @@ std::vector<std::vector<int>> tileForChipToMove;
 bool captureAvailable = false;
 bool sideCanTurn = true;
 
-bool canMakeMove (int, int, int, int, const Chip&);
+bool canMakeMove (int, int, int, int, const Chip&); й
 bool isMovingInCorrectDirection(int, int, int, int, const Chip&);
 void makeMove (int, int, int, int);
 bool isCaptureMove(int, int, int, int, const Chip&);
@@ -25,7 +24,7 @@ bool isDesiredTileInBounds(int, int);
 void determineWhoCanTurn();
 void determineWhereCanGo(int, int, const Chip&);
 
-JNIEXPORT void JNICALL Java_Main_GameBoard_setupGame
+void Java_Main_GameBoard_setupGame
         (JNIEnv *, jobject){
     //setting all game variables to a start state
     chosenRow = -1;
@@ -53,7 +52,7 @@ JNIEXPORT void JNICALL Java_Main_GameBoard_setupGame
     determineWhoCanTurn();
 }
 
-JNIEXPORT void JNICALL Java_Main_GameBoard_setupEmptyGame
+void Java_Main_GameBoard_setupEmptyGame
         (JNIEnv *, jobject) {
     //setting all game variables to a start state
     chosenRow = -1;
@@ -69,14 +68,14 @@ JNIEXPORT void JNICALL Java_Main_GameBoard_setupEmptyGame
     }
 }
 
-JNIEXPORT void JNICALL Java_Main_GameBoard_insertChip
+void Java_Main_GameBoard_insertChip
         (JNIEnv *, jobject, jint row, jint column, jboolean isWhite, jboolean isKing) {
     gameBoard[row][column] = std::make_unique<Chip>(isWhite, isKing);
 
     determineWhoCanTurn();
 }
 
-JNIEXPORT void JNICALL Java_Main_GameBoard_handleClick
+void Java_Main_GameBoard_handleClick
         (JNIEnv *, jobject, jint row, jint column) {
     if (chosenRow == -1 && chosenColumn == -1) //no chosen tile
     {
@@ -105,7 +104,7 @@ JNIEXPORT void JNICALL Java_Main_GameBoard_handleClick
     }
 }
 
-JNIEXPORT jint JNICALL Java_Main_GameBoard_getTileInformation
+jint Java_Main_GameBoard_getTileInformation
         (JNIEnv *, jobject, jint row, jint column) {
     auto returnInt = int(10);
 
