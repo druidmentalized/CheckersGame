@@ -32,11 +32,13 @@ This project is a **Checkers game** featuring a user-friendly **Java Swing** GUI
 - **GUI Framework**: Java Swing
 - **Integration**: Java Native Interface (JNI)
 - **Testing**: JUnit
-- **Development Environment**: IntelliJ IDEA and IntelliJ CLion.
+- **Development Environment**: 
+  - IntelliJ IDEA 
+  - IntelliJ CLion
 
 ## How to play
 - Launch the application.
-- Player 1 (red) starts the game.
+- Player 1 starts the game.
 - Choose a piece and tile for its ending position; invalid moves will be blocked.
 - The game ends when one player has no valid moves left or all their pieces are captured.
 
