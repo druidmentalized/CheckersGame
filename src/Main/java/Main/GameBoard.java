@@ -70,7 +70,6 @@ public class GameBoard extends JPanel{
             }
         });
         this.setFocusable(true);
-
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {

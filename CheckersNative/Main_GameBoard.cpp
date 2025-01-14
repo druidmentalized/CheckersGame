@@ -16,7 +16,7 @@ std::vector<std::vector<int>> tileForChipToMove;
 bool captureAvailable = false;
 bool sideCanTurn = true;
 
-bool canMakeMove (int, int, int, int, const Chip&); й
+bool canMakeMove (int, int, int, int, const Chip&);
 bool isMovingInCorrectDirection(int, int, int, int, const Chip&);
 void makeMove (int, int, int, int);
 bool isCaptureMove(int, int, int, int, const Chip&);
@@ -203,7 +203,7 @@ bool isCaptureMove(int startRow, int startColumn, int desiredRow, int desiredCol
                 if ((tempRow == desiredRow) && (tempColumn == desiredColumn)) { //chip would move to the destination after this capture
                     return true;
                 }
-                else if (canMakeMove(startRow, startColumn, tempRow, tempColumn, checkedChip)) { //sequence of captures leads to desired tile
+                else if (canMakeMove(tempRow, tempColumn, desiredRow, desiredColumn, checkedChip)) { //sequence of captures leads to desired tile
                     return true;
                 }
                 else { //sequence of captures after this won't lead to the desired tile

@@ -20,6 +20,10 @@ This project is a **Checkers game** featuring a user-friendly **Java Swing** GUI
   - Prevents illegal moves and provides on-screen feedback.
 - **Unit Testing**:
   - Comprehensive tests using **JUnit** to ensure the correctness of Java components.
+  
+## Gameplay
+
+![Main Game Screenshot](src/Resources/gameplay.png)
 
 ## Technologies Used
 - **Programming Language**: 
